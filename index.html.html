@@ -1,0 +1,31 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OPULIS - Presale</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://api.coingecko.com https://mainnet.infura.io;">
+</head>
+<body style="font-family: 'Orbitron', sans-serif; background: black; color: white; text-align:center; padding-top:100px;">
+    <h1>OPULIS - Presale</h1>
+    <button onclick="connectMetaMask()" style="background-color:#FF00A8; color:white; padding:15px; border-radius:10px; border:none; cursor:pointer;">Collega Wallet</button>
+
+    <script>
+        async function connectMetaMask() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    await ethereum.request({ method: 'eth_requestAccounts' });
+                    alert('MetaMask collegato con successo!');
+                } catch (error) {
+                    alert('Errore di connessione MetaMask: ' + error.message);
+                }
+            } else {
+                alert('MetaMask non trovato. Installa MetaMask e riprova.');
+            }
+        }
+    </script>
+</body>
+</html>
