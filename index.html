@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>OPULIS TEST</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+  <script src="https://unpkg.com/@walletconnect/web3-provider@latest/dist/umd/index.min.js"></script>
+  <script src="https://unpkg.com/web3modal@latest/dist/index.js"></script>
+</head>
+<body style="background:#000;color:#fff;font-family:sans-serif;text-align:center;padding-top:100px;">
+  <h1>OPULIS Presale LIVE</h1>
+  <button id="connectBtn" style="padding:10px 20px;font-size:16px;">🔌 Collega Wallet</button><br><br>
+  <input id="amount" placeholder="Importo" type="number" style="padding:10px;width:200px;"><br><br>
+  <select id="currency" style="padding:10px;">
+    <option value="ETH">ETH</option>
+    <option value="USDT">USDT</option>
+    <option value="USDC">USDC</option>
+  </select><br><br>
+  <button id="buyBtn" style="padding:10px 20px;font-size:16px;">💸 Acquista OPX</button>
+
+<script>
+let signer;
+const contractAddress = "0x23a36aed192775e204245b65d7aae201274778d9";
+const abi = [
+  {"inputs":[],"name":"contributeETH","outputs":[],"stateMutability":"payable","type":"function"},
+  {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"contributeUSDT","outputs":[],"stateMutability":"nonpayable","type":"function"},
+  {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"contributeUSDC","outputs":[],"stateMutability":"nonpayable","type":"function"}
+];
+
+const providerOptions = {
+  walletconnect: {
+    package: window.WalletConnectProvider.default,
+    options: {
+      rpc: {
+        1: "https://mainnet.infura.io/v3/YOUR_INFURA_ID"
+      }
+    }
+  }
+};
+
+const web3Modal = new window.Web3Modal.default({
+  cacheProvider: false,
+  providerOptions
+});
+
+document.getElementById("connectBtn").onclick = async () => {
+  try {
+    const instance = await web3Modal.connect();
+    const provider = new ethers.providers.Web3Provider(instance);
+    signer = provider.getSigner();
+    alert("✅ Wallet collegato");
+  } catch (err) {
+    alert("Errore nel collegamento: " + err.message);
+  }
+};
+
+document.getElementById("buyBtn").onclick = async () => {
+  const amount = parseFloat(document.getElementById("amount").value);
+  const currency = document.getElementById("currency").value;
+  if (!signer || isNaN(amount) || amount <= 0) {
+    alert("Collega il wallet e inserisci un importo valido");
+    return;
+  }
+
+  const contract = new ethers.Contract(contractAddress, abi, signer);
+  try {
+    let tx;
+    if (currency === "ETH") {
+      tx = await contract.contributeETH({ value: ethers.utils.parseEther(amount.toString()) });
+    } else {
+      const value = ethers.utils.parseUnits(amount.toString(), 6);
+      tx = currency === "USDT" ?
+        await contract.contributeUSDT(value) :
+        await contract.contributeUSDC(value);
+    }
+    alert("✅ Transazione inviata");
+    await tx.wait();
+    alert("🎉 Acquisto completato");
+  } catch (err) {
+    alert("Errore: " + err.message);
+  }
+};
+</script>
+</body>
+</html>
